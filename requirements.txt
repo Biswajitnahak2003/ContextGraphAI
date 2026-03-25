@@ -1,0 +1,10 @@
+streamlit
+pyvis
+networkx
+groq
+pandas
+python-dotenv
+fastapi
+uvicorn
+requests
+pydantic

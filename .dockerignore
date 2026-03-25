@@ -1,0 +1,9 @@
+.venv
+my-env
+__pycache__
+.git
+.github
+uv.lock
+Dockerfile
+.dockerignore
+.python-version

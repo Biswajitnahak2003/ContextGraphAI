@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+my-env/
+
+# Data
+sap_o2c.db
+
+# Env
+.env
+
+# OS
+.DS_Store
+Thumbs.db
