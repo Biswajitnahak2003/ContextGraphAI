@@ -5,7 +5,6 @@ __pycache__/
 my-env/
 
 # Data
-sap_o2c.db
 
 # Env
 .env
