@@ -1,8 +1,9 @@
 # Context Graph AI for SAP O2C
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-contextgraphai.onrender.com-success?style=for-the-badge)](https://contextgraphai.onrender.com)
-
 A sophisticated graph-based data modeling and natural language query system designed to unify fragmented SAP Order-to-Cash (O2C) data.
+
+## Live Demo
+[https://contextgraphai.onrender.com](https://contextgraphai.onrender.com)
 
 ## Project Structure
 - `src/`

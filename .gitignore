@@ -5,10 +5,13 @@ __pycache__/
 my-env/
 
 # Data
+sap_o2c.db
+sap-o2c-data/
 
 # Env
 .env
 
-# OS
+# OS & Auto-generated
 .DS_Store
 Thumbs.db
+lib/
