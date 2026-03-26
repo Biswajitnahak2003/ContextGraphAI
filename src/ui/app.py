@@ -15,12 +15,18 @@ API_URL = "http://localhost:8000"
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;700&display=swap');
+    
+    /* Remove Top White Space in Streamlit */
+    .block-container { padding-top: 2rem !important; padding-bottom: 1rem !important; max-width: 95% !important; }
+    header[data-testid="stHeader"] { display: none !important; }
+    
     .stApp { background-color: #fcfcfd; font-family: 'Inter', sans-serif; }
-    .header { font-family: 'Outfit', sans-serif; font-size: 20px; color: #0f172a; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; margin-bottom: 25px; display: flex; align-items: center; background: white; }
+    .header { font-family: 'Outfit', sans-serif; font-size: 20px; color: #0f172a; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; margin-bottom: 25px; display: flex; align-items: center; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); }
     .badge { background: #f1f5f9; color: #64748b; padding: 2px 10px; border-radius: 6px; font-size: 12px; margin-right: 15px; }
     .chat-container { background: white; border-radius: 16px; padding: 24px; border: 1px solid #f1f5f9; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05); height: 85vh; display: flex; flex-direction: column; }
     .graph-container { background: white; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05); height: 85vh; overflow: hidden; }
 </style>
+
 """, unsafe_allow_html=True)
 
 # Initialize Session State
