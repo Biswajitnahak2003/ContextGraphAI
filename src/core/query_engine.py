@@ -31,7 +31,7 @@ class QueryEngine:
 
     def process_query(self, user_query, graph_manager):
         import re
-        doc_ids = re.findall(r'\b\d{6,10}\b', user_query)
+        doc_ids = re.findall(r'\d{6,10}', user_query)
         
         context_data = {"nodes": [], "edges": []}
         seen_nodes = set()

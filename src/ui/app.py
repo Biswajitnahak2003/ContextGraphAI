@@ -95,7 +95,7 @@ with col_chat:
         
         # Extract ID for filtering
         import re
-        doc_ids = re.findall(r'\b\d{6,10}\b', prompt)
+        doc_ids = re.findall(r'\d{6,10}', prompt)
         if doc_ids:
             st.session_state.active_so_id = doc_ids[0]
 
