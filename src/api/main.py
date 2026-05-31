@@ -62,9 +62,15 @@ async def get_graph(so_id: Optional[str] = None):
 
 @app.post("/query", response_model=QueryResponse)
 async def process_query(request: QueryRequest):
-    """Processes natural language queries via Groq."""
-    response = qe.process_query(request.user_query, gm)
-    return QueryResponse(response=response)
+    """Processes natural language queries via OpenRouter."""
+    try:
+        response = qe.process_query(request.user_query, gm)
+        return QueryResponse(response=response)
+    except Exception as e:
+        import traceback
+        error_detail = traceback.format_exc()
+        print(f"[QUERY ERROR] {error_detail}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
