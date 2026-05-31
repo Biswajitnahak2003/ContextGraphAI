@@ -1,7 +1,7 @@
 streamlit
 pyvis
 networkx
-groq
+openai
 pandas
 python-dotenv
 fastapi

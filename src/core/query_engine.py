@@ -1,5 +1,5 @@
 import os
-from groq import Groq
+from openai import OpenAI
 from dotenv import load_dotenv
 import json
 
@@ -8,11 +8,14 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 class QueryEngine:
     def __init__(self):
-        self.api_key = os.getenv("GROQ_API_KEY")
+        self.api_key = os.getenv("OPENROUTER_API_KEY")
         if not self.api_key:
-            raise ValueError("GROQ_API_KEY not found in environment variables.")
-        self.client = Groq(api_key=self.api_key)
-        self.model = "llama-3.1-8b-instant"
+            raise ValueError("OPENROUTER_API_KEY not found in environment variables.")
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=self.api_key
+        )
+        self.model = "meta-llama/llama-3.1-8b-instruct:free"
 
     def _get_system_prompt(self, context_data):
         return f"""
@@ -56,7 +59,7 @@ class QueryEngine:
         if not context_data["nodes"]:
             return "I couldn't find any relevant document numbers in your query. Please provide a Sales Order, Delivery, or Billing ID to analyze (e.g., 740556)."
 
-        # 2. Call Groq
+        # Call OpenRouter
         chat_completion = self.client.chat.completions.create(
             messages=[
                 {"role": "system", "content": self._get_system_prompt(context_data)},
