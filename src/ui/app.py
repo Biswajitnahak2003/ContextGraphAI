@@ -15,11 +15,19 @@ API_URL = "http://localhost:8000"
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;700&display=swap');
-    .stApp { background-color: #fcfcfd; font-family: 'Inter', sans-serif; }
-    .header { font-family: 'Outfit', sans-serif; font-size: 20px; color: #0f172a; padding: 15px 20px; border-bottom: 1px solid #f1f5f9; margin-bottom: 25px; display: flex; align-items: center; background: white; }
+    .stApp { background-color: #fcfcfd; font-family: 'Inter', sans-serif; color: #0f172a; }
+    /* Kill Streamlit default top padding */
+    .block-container { padding-top: 1rem !important; padding-bottom: 0 !important; }
+    .header { font-family: 'Outfit', sans-serif; font-size: 20px; color: #0f172a; padding: 10px 20px; margin-bottom: 10px; display: flex; align-items: center; }
     .badge { background: #f1f5f9; color: #64748b; padding: 2px 10px; border-radius: 6px; font-size: 12px; margin-right: 15px; }
-    .chat-container { background: white; border-radius: 16px; padding: 24px; border: 1px solid #f1f5f9; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05); height: 85vh; display: flex; flex-direction: column; }
-    .graph-container { background: white; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05); height: 85vh; overflow: hidden; }
+    .chat-container { background: white; border-radius: 16px; padding: 24px; border: 1px solid #f1f5f9; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05); height: 80vh; display: flex; flex-direction: column; color: #0f172a !important; }
+    .graph-container { background: white; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05); height: 80vh; overflow: hidden; }
+    /* Force text color in chat messages */
+    div[data-testid="stChatMessage"] { color: #0f172a !important; background-color: transparent !important; }
+    div[data-testid="stMarkdownContainer"] p { color: #0f172a !important; }
+    /* Hide Streamlit hamburger menu and footer for cleaner look */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -44,7 +52,7 @@ with col_graph:
         if response.status_code == 200:
             graph_data = response.json()
             
-            net = Network(height="800px", width="100%", bgcolor="#ffffff", font_color="#334155")
+            net = Network(height="700px", width="100%", bgcolor="#ffffff", font_color="#334155")
             
             COLORS = {
                 'SalesOrder': '#3b82f6', 'Customer': '#ef4444', 'Product': '#10b981', 
@@ -66,7 +74,7 @@ with col_graph:
                 net.save_graph(tmp.name)
                 with open(tmp.name, 'r', encoding='utf-8') as f:
                     html = f.read()
-                components.html(html, height=800)
+                components.html(html, height=700)
         else:
             st.error("Failed to load graph data from API.")
     except Exception as e:
