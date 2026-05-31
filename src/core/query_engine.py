@@ -15,7 +15,7 @@ class QueryEngine:
             base_url="https://openrouter.ai/api/v1",
             api_key=self.api_key
         )
-        self.model = "meta-llama/llama-3.3-70b-instruct:free"
+        self.model = "deepseek/deepseek-v4-flash:free"
 
     def _get_system_prompt(self, context_data):
         return f"""
