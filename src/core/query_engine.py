@@ -2,20 +2,31 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 import json
+import requests
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 class QueryEngine:
     def __init__(self):
-        self.api_key = os.getenv("OPENROUTER_API_KEY")
-        if not self.api_key:
-            raise ValueError("OPENROUTER_API_KEY not found in environment variables.")
-        self.client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=self.api_key
-        )
-        self.model = "google/gemma-4-26b-a4b-it:free"
+        self.gemini_api_key = os.getenv("GEMINI_API_KEY")
+        self.openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+
+        if not self.gemini_api_key and not self.openrouter_api_key:
+            raise ValueError("Neither GEMINI_API_KEY nor OPENROUTER_API_KEY found in environment variables.")
+
+        if self.gemini_api_key:
+            # Use direct Gemini API (extremely high limits, very robust)
+            self.model = "gemini-2.5-flash"
+            print(f"[QueryEngine] Using Direct Gemini API ({self.model})")
+        else:
+            # Fallback to OpenRouter (using Llama 3.3 70B which has multiple providers to prevent rate limits)
+            self.client = OpenAI(
+                base_url="https://openrouter.ai/api/v1",
+                api_key=self.openrouter_api_key
+            )
+            self.model = "meta-llama/llama-3.3-70b-instruct:free"
+            print(f"[QueryEngine] Using OpenRouter API ({self.model})")
 
     def _get_system_prompt(self, context_data):
         return f"""
@@ -59,17 +70,48 @@ class QueryEngine:
         if not context_data["nodes"]:
             return "I couldn't find any relevant document numbers in your query. Please provide a Sales Order, Delivery, or Billing ID to analyze (e.g., 740556)."
 
-        # Call OpenRouter
-        chat_completion = self.client.chat.completions.create(
-            messages=[
-                {"role": "system", "content": self._get_system_prompt(context_data)},
-                {"role": "user", "content": user_query}
-            ],
-            model=self.model,
-            max_tokens=1024
-        )
-        
-        return chat_completion.choices[0].message.content
+        # Route request based on API Key presence
+        if self.gemini_api_key:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.gemini_api_key}"
+            headers = {"Content-Type": "application/json"}
+            payload = {
+                "contents": [
+                    {
+                        "role": "user",
+                        "parts": [{"text": user_query}]
+                    }
+                ],
+                "systemInstruction": {
+                    "parts": [{"text": self._get_system_prompt(context_data)}]
+                },
+                "generationConfig": {
+                    "maxOutputTokens": 1024,
+                    "temperature": 0.2
+                }
+            }
+            try:
+                response = requests.post(url, headers=headers, json=payload, timeout=30)
+                if response.status_code == 200:
+                    res_json = response.json()
+                    try:
+                        return res_json["candidates"][0]["content"]["parts"][0]["text"]
+                    except (KeyError, IndexError):
+                        return f"Gemini API returned an unexpected response format: {json.dumps(res_json)}"
+                else:
+                    return f"Gemini API Error ({response.status_code}): {response.text}"
+            except Exception as e:
+                return f"Failed to connect to Gemini API: {str(e)}"
+        else:
+            # Call OpenRouter
+            chat_completion = self.client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": self._get_system_prompt(context_data)},
+                    {"role": "user", "content": user_query}
+                ],
+                model=self.model,
+                max_tokens=1024
+            )
+            return chat_completion.choices[0].message.content
 
 if __name__ == "__main__":
     from graph_manager import GraphManager

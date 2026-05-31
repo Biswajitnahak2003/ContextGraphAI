@@ -30,7 +30,11 @@ The application evolved from a monolithic script into a client-server model:
 ## LLM Strategy & Guardrails
 
 ### Prompting Strategy
-The system uses **OpenRouter (Gemma 4 26B A4B IT - free tier)** for rapid, cost-effective inference. To ensure factual accuracy ("Context Graphing"), we use a **Data Grounding Strategy**:
+The system supports two LLM API providers:
+1. **Direct Google Gemini API (Recommended):** By setting the `GEMINI_API_KEY` environment variable, the system uses the official Google Gemini API (`gemini-2.5-flash`). This provides extremely generous free-tier rate limits and does not suffer from OpenRouter's shared upstream rate limits.
+2. **OpenRouter API:** If `GEMINI_API_KEY` is not present, the system falls back to `OPENROUTER_API_KEY` using Meta's powerful **Llama 3.3 70B Instruct** model (`meta-llama/llama-3.3-70b-instruct:free`). We use this model because it is served by multiple massive providers on OpenRouter, preventing shared upstream rate limit (429) failures.
+
+To ensure factual accuracy ("Context Graphing"), we use a **Data Grounding Strategy**:
 1. **Dynamic Subgraph Extraction**: When a user queries a document (e.g., "Status of Order 740506"), the system searches the graph and extracts *only* the relevant connected nodes and their attributes.
 2. **Context Injection**: This subgraph data is formatted as JSON and injected directly into the LLM's system prompt.
 3. **Instruction**: The LLM is explicitly instructed to act as "Dodge AI" and answer *strictly* using the provided JSON context.
@@ -45,7 +49,7 @@ To prevent hallucinations and out-of-domain answers, robust guardrails are imple
 
 ### Local Setup
 1. Clone the repository and install requirements: `pip install -r requirements.txt`.
-2. Set your `OPENROUTER_API_KEY` in a `.env` file at the root.
+2. Set either `GEMINI_API_KEY` (recommended for direct access) or `OPENROUTER_API_KEY` (for fallback) in a `.env` file at the root.
 3. Ingest the data: `python src/ingest_data.py`.
 
 ### Running Locally
