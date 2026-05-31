@@ -54,9 +54,18 @@ class QueryEngine:
             for doc_id in doc_ids:
                 subgraph = graph_manager.get_subgraph_for_order(doc_id)
                 if subgraph:
-                    # Limit to top 50 nodes to avoid token overflow
+                    # Always prioritize the queried document node first to ensure it's never truncated
+                    for node, attrs in subgraph.nodes(data=True):
+                        if str(node) == str(doc_id):
+                            if node not in seen_nodes:
+                                essential_attrs = {k: v for k, v in attrs.items() if k in ['type', 'label', 'totalNetAmount', 'postingDate', 'billingDocumentDate', 'creationDate']}
+                                context_data["nodes"].append({"id": node, "attrs": essential_attrs})
+                                seen_nodes.add(node)
+                                break
+
+                    # Limit to top 200 nodes to avoid token overflow
                     for i, (node, attrs) in enumerate(subgraph.nodes(data=True)):
-                        if i > 50: break
+                        if i > 200: break
                         if node not in seen_nodes:
                             # Only send key attributes to save tokens
                             essential_attrs = {k: v for k, v in attrs.items() if k in ['type', 'label', 'totalNetAmount', 'postingDate', 'billingDocumentDate', 'creationDate']}
@@ -64,7 +73,7 @@ class QueryEngine:
                             seen_nodes.add(node)
                     
                     for i, (u, v, attrs) in enumerate(subgraph.edges(data=True)):
-                        if i > 50: break
+                        if i > 200: break
                         context_data["edges"].append({"from": u, "to": v, "label": attrs.get('label')})
 
         if not context_data["nodes"]:

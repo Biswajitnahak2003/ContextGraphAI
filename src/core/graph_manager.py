@@ -78,18 +78,40 @@ class GraphManager:
         return self.graph
 
     def get_subgraph_for_order(self, sales_order_id):
-        # Extract related nodes for a specific order to keep visualization clean
-        if sales_order_id not in self.graph:
+        # Extract related nodes for a specific document to keep visualization clean
+        # Handle string or integer lookup gracefully
+        target_node = None
+        if sales_order_id in self.graph:
+            target_node = sales_order_id
+        else:
+            try:
+                val = int(sales_order_id)
+                if val in self.graph:
+                    target_node = val
+            except ValueError:
+                pass
+            
+            # If not found, try converting to string representation
+            if target_node is None:
+                str_val = str(sales_order_id)
+                if str_val in self.graph:
+                    target_node = str_val
+
+        if target_node is None:
             return None
         
-        nodes = {sales_order_id}
-        # Get neighbors (one level out)
+        nodes = {target_node}
+        # Get neighbors up to 3 levels out
         levels = 3
-        current_nodes = {sales_order_id}
+        current_nodes = {target_node}
         for _ in range(levels):
             next_nodes = set()
             for node in current_nodes:
                 if node in self.graph:
+                    node_type = self.graph.nodes[node].get('type')
+                    # Stop traversing further past Customer or Product hub nodes to avoid pulling in the entire DB
+                    if node_type in ['Customer', 'Product']:
+                        continue
                     next_nodes.update(self.graph.neighbors(node))
                     next_nodes.update(self.graph.predecessors(node))
             nodes.update(next_nodes)
