@@ -30,7 +30,7 @@ The application evolved from a monolithic script into a client-server model:
 ## LLM Strategy & Guardrails
 
 ### Prompting Strategy
-The system uses **OpenRouter (Llama 3.1 8B Instruct - free tier)** for rapid, cost-effective inference. To ensure factual accuracy ("Context Graphing"), we use a **Data Grounding Strategy**:
+The system uses **OpenRouter (Llama 3.3 70B Instruct - free tier)** for rapid, cost-effective inference. To ensure factual accuracy ("Context Graphing"), we use a **Data Grounding Strategy**:
 1. **Dynamic Subgraph Extraction**: When a user queries a document (e.g., "Status of Order 740506"), the system searches the graph and extracts *only* the relevant connected nodes and their attributes.
 2. **Context Injection**: This subgraph data is formatted as JSON and injected directly into the LLM's system prompt.
 3. **Instruction**: The LLM is explicitly instructed to act as "Dodge AI" and answer *strictly* using the provided JSON context.
